@@ -1,7 +1,7 @@
-package be.kevinbaes.bap;
+package be.kevinbaes.bap.jmetersampler;
 
-import io.r2dbc.pool.ConnectionPool;
-import io.r2dbc.spi.ConnectionFactory;
+import be.kevinbaes.bap.jmetersampler.jdbc.JdbcConfig;
+import be.kevinbaes.bap.jmetersampler.jdbc.JdbcGoalRepository;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -9,18 +9,21 @@ import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.testelement.TestElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Mono;
 import sun.nio.ch.Interruptible;
 
+import javax.sql.DataSource;
 import java.io.Serializable;
 import java.util.Iterator;
 
 /**
- * This class was based on the SleepTest class from the jmeter source.
+ * Sampler that can insert and select using JDBC driver.
+ * The reason to use this over the standard jdbc sampler in jmeter is that this
+ * implementation comes as close as possible to the R2DBC implementation, meaning
+ * more reliable result tests.
  */
-public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializable, Interruptible {
+public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializable, Interruptible {
 
-  private static final Logger LOG = LoggerFactory.getLogger(R2dbcSampler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JdbcSampler.class);
 
   private static final String QUERY_TYPE_PARAM = "Query type";
   private static final String INSERT_COUNT_PARAM = "Insert count";
@@ -38,19 +41,19 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
 
   private transient volatile Thread myThread;
 
-  private ConnectionFactory connectionFactory;
-  private R2dbcGoalRepository goalRepository;
+  private DataSource dataSource;
+  private JdbcGoalRepository goalRepository;
 
   /**
    * The Java Sampler uses the default constructor to instantiate an instance
    * of the client class.
    */
-  public R2dbcSampler() {
+  public JdbcSampler() {
     LOG.debug(whoAmI() + "\tConstruct");
   }
 
   /**
-   * Get driver configuration parameters and initialze R2dbcGoalRepository
+   * Get driver configuration parameters and initialze JdbcGoalRepository
    */
   @Override
   public void setupTest(JavaSamplerContext context) {
@@ -62,8 +65,10 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
     queryType = context.getParameter(QUERY_TYPE_PARAM, SELECT);
     insertCount = context.getIntParameter(INSERT_COUNT_PARAM, INSERT_COUNT_DEFAULT);
 
-    this.connectionFactory = new R2dbcConfig().postgresConnectionFactory();
-    this.goalRepository = new R2dbcGoalRepository(connectionFactory);
+    LOG.info("insert count: " + insertCount);
+
+    this.dataSource = new JdbcConfig().postgresDataSource();
+    this.goalRepository = new JdbcGoalRepository(dataSource);
 
     name = context.getParameter(TestElement.NAME);
   }
@@ -95,7 +100,6 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
     try {
       // Record sample start time.
       results.sampleStart();
-
       myThread = Thread.currentThread();
       // Execute the sample. In this case sleep for the
       // specified time.
@@ -103,24 +107,16 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
       if(queryType.equals(INSERT)) {
         LOG.info("inserting [{}] times", insertCount);
 
-        Mono<Void> inserts = Mono.empty();
-
-        for (int i = 0; i < insertCount; i++) {
-          inserts = inserts.then(goalRepository.insert(i));
-        }
-
-        inserts.block();
+        goalRepository.insert(insertCount);
       } else {
-        goalRepository
-            .select()
-            .block();
+
       }
 
       myThread = null;
 
       results.setSuccessful(true);
     } catch (Exception e) {
-      LOG.error("R2dbcTest: error during sample", e);
+      LOG.error("JdbcTest: error during sample", e);
       results.setSuccessful(false);
       results.setResponseMessage(e.toString());
     } finally {

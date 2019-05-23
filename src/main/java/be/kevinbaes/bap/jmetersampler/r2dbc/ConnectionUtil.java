@@ -1,32 +1,26 @@
-package be.kevinbaes.bap;
+package be.kevinbaes.bap.jmetersampler.r2dbc;
 
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.pool.ConnectionPoolConfiguration;
 import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
 import io.r2dbc.postgresql.PostgresqlConnectionFactory;
-import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.ConnectionFactoryOptions;
 
 import java.time.Duration;
 
-import static io.r2dbc.spi.ConnectionFactoryOptions.*;
+public class ConnectionUtil {
 
-public class R2dbcConfig {
-
-  public ConnectionPool pooledConnectionFactory() {
-    ConnectionFactory connectionFactory = postgresConnectionFactory();
-
-    ConnectionPoolConfiguration configuration = ConnectionPoolConfiguration.builder(connectionFactory)
+  public static ConnectionPool pooledConnectionFactory(ConnectionFactory baseFactory) {
+    ConnectionPoolConfiguration configuration = ConnectionPoolConfiguration.builder(baseFactory)
         .validationQuery("SELECT 1")
         .maxIdleTime(Duration.ofMillis(1000))
-        .maxSize(20)
+        .maxSize(10)
         .build();
 
     return new ConnectionPool(configuration);
   }
 
-  public ConnectionFactory postgresConnectionFactory() {
+  public static ConnectionFactory postgresConnectionFactory() {
     return new PostgresqlConnectionFactory(PostgresqlConnectionConfiguration.builder()
         .host("127.0.0.1")
         .port(5432) // optional, defaults to 5432

@@ -1,4 +1,4 @@
-package be.kevinbaes.bap;
+package be.kevinbaes.bap.jmetersampler.domain;
 
 public class Goal {
   private Integer id;
