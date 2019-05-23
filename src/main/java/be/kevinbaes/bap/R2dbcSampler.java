@@ -9,6 +9,7 @@ import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.testelement.TestElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 import sun.nio.ch.Interruptible;
 
 import java.io.Serializable;
@@ -22,14 +23,18 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
   private static final Logger LOG = LoggerFactory.getLogger(R2dbcSampler.class);
 
   private static final String QUERY_TYPE_PARAM = "Query type";
+  private static final String INSERT_COUNT_PARAM = "Insert count";
 
   private static final String INSERT = "insert";
   private static final String SELECT = "select";
+
+  private static int INSERT_COUNT_DEFAULT = 1;
 
   private String queryType;
 
   // The name of the sampler
   private String name;
+  private int insertCount;
 
   private transient volatile Thread myThread;
 
@@ -55,8 +60,9 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
     }
 
     queryType = context.getParameter(QUERY_TYPE_PARAM, SELECT);
+    insertCount = context.getIntParameter(INSERT_COUNT_PARAM, INSERT_COUNT_DEFAULT);
 
-    connectionFactory = new R2dbcConfig().pooledConnectionFactory();
+    this.connectionFactory = new R2dbcConfig().postgresConnectionFactory();
     this.goalRepository = new R2dbcGoalRepository(connectionFactory);
 
     name = context.getParameter(TestElement.NAME);
@@ -95,15 +101,20 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
       // specified time.
 
       if(queryType.equals(INSERT)) {
-        goalRepository
-            .insert()
-            .block();
+        LOG.info("inserting [{}] times", insertCount);
+
+        Mono<Void> inserts = Mono.empty();
+
+        for (int i = 0; i < insertCount; i++) {
+          inserts = inserts.then(goalRepository.insert(i));
+        }
+
+        inserts.block();
       } else {
         goalRepository
             .select()
             .block();
       }
-
 
       myThread = null;
 
@@ -113,7 +124,6 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
       results.setSuccessful(false);
       results.setResponseMessage(e.toString());
     } finally {
-      ((ConnectionPool) connectionFactory).dispose();
       results.sampleEnd();
     }
 
@@ -142,6 +152,7 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
     Arguments params = new Arguments();
 
     params.addArgument(QUERY_TYPE_PARAM, SELECT);
+    params.addArgument(INSERT_COUNT_PARAM, Integer.toString(INSERT_COUNT_DEFAULT));
 
     return params;
   }

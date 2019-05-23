@@ -13,17 +13,28 @@ public class R2dbcGoalRepository {
     this.connectionFactory = connectionFactory;
   }
 
-  public Mono<Void> insert() {
+  public Mono<Void> insert(int i) {
     return Mono.from(connectionFactory.create())
         .flatMapMany(conn ->
-            Flux.from(conn.createStatement("INSERT INTO goal (name) VALUES ($1),($2)")
-                .bind("$1", "Create an application")
-                .bind("$2", "Create a second application")
+            Flux.from(conn.createStatement("INSERT INTO goal (name) VALUES ($1)")
+                .bind("$1", createRandomString(i))
                 .execute())
                 .flatMap(result -> Mono.from(result.getRowsUpdated()))
                 .concatWith(Mono.from(conn.close()).then(Mono.empty()))
                 .onErrorResume(e -> Mono.from(conn.close()).then(Mono.error(e)))
         ).then();
+  }
+
+  /**
+   * Implementation from https://www.baeldung.com/java-random-string
+   * @return a random string of length 10
+   */
+  private String createRandomString(int i) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(Thread.currentThread().getName());
+    builder.append("-value-");
+    builder.append(i);
+    return builder.toString();
   }
 
   public Mono<Void> select() {
