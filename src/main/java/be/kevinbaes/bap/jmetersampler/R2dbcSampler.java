@@ -1,5 +1,6 @@
 package be.kevinbaes.bap.jmetersampler;
 
+import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
 import be.kevinbaes.bap.jmetersampler.r2dbc.R2dbcTest;
 import be.kevinbaes.bap.jmetersampler.r2dbc.R2dbcTestConfiguration;
 import org.apache.jmeter.config.Arguments;
@@ -39,8 +40,18 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
   private static final String QUERY_TYPE_PARAM = "Query type";
   private static final String INSERT_COUNT_PARAM = "Insert count";
 
+  private static final String USERNAME_PARAM = "Username";
+  private static final String PASSWORD_PARAM = "Password";
+  private static final String HOST_PARAM = "Host";
+  private static final String PORT_PARAM = "Port";
+  private static final String DATABASE_PARAM = "Database";
+
   private static int INSERT_COUNT_DEFAULT = 1;
   private static final String DRIVER_TYPE_DEFAULT = "pooled";
+  private static final String USERNAME_DEFAULT = "postgres";
+  private static final String HOST_DEFAULT = "localhost";
+  private static final int PORT_DEFAULT = 5432;
+  private static final String DATABASE_DEFAULT = "postgres";
 
   private String samplerName;
 
@@ -70,7 +81,14 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
     String queryType = context.getParameter(QUERY_TYPE_PARAM, SELECT);
     int insertCount = context.getIntParameter(INSERT_COUNT_PARAM, INSERT_COUNT_DEFAULT);
 
-    r2dbcTest = new R2dbcTest(new R2dbcTestConfiguration(driverType, queryType, insertCount));
+    String username = context.getParameter(USERNAME_PARAM);
+    String password = context.getParameter(PASSWORD_PARAM);
+    int port = context.getIntParameter(PORT_PARAM);
+    String host = context.getParameter(HOST_PARAM);
+    String database = context.getParameter(DATABASE_PARAM);
+
+    ConnectionOptions options = new ConnectionOptions(username, password, port, database, host);
+    r2dbcTest = new R2dbcTest(new R2dbcTestConfiguration(driverType, queryType, insertCount), options);
 
     samplerName = context.getParameter(TestElement.NAME);
   }
@@ -140,6 +158,12 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
     params.addArgument(DRIVER_TYPE_PARAM, DRIVER_TYPE_DEFAULT);
     params.addArgument(QUERY_TYPE_PARAM, SELECT);
     params.addArgument(INSERT_COUNT_PARAM, Integer.toString(INSERT_COUNT_DEFAULT));
+
+    params.addArgument(USERNAME_PARAM, USERNAME_DEFAULT);
+    params.addArgument(PASSWORD_PARAM, "");
+    params.addArgument(HOST_PARAM, HOST_DEFAULT);
+    params.addArgument(PORT_PARAM, Integer.toString(PORT_DEFAULT));
+    params.addArgument(DATABASE_PARAM, DATABASE_DEFAULT);
 
     return params;
   }

@@ -1,5 +1,6 @@
 package be.kevinbaes.bap.jmetersampler.r2dbc;
 
+import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.spi.ConnectionFactory;
 import org.slf4j.Logger;
@@ -15,12 +16,13 @@ public class R2dbcTest {
   private ConnectionFactory connectionFactory;
   private final R2dbcGoalRepository goalRepository;
 
-  public R2dbcTest(R2dbcTestConfiguration config) {
+  public R2dbcTest(R2dbcTestConfiguration config, ConnectionOptions connectionOptions) {
     this.config = config;
-    this.connectionFactory = ConnectionUtil.postgresConnectionFactory();
+    R2dbcConnectionUtil connectionUtil = new R2dbcConnectionUtil(connectionOptions);
+    this.connectionFactory = connectionUtil.postgresConnectionFactory();
 
     if(this.config.getDriverType().equals(POOLED)) {
-      this.connectionFactory = ConnectionUtil.pooledConnectionFactory(connectionFactory);
+      this.connectionFactory = connectionUtil.pooledConnectionFactory(connectionFactory);
     }
 
     this.goalRepository = new R2dbcGoalRepository(connectionFactory);

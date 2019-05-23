@@ -14,7 +14,7 @@ public class JdbcGoalRepository {
   }
 
   public void select() {
-
+    // TODO add select
   }
 
   public void insert(int count) throws SQLException {
