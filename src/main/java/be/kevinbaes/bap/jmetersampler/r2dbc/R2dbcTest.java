@@ -1,10 +1,14 @@
 package be.kevinbaes.bap.jmetersampler.r2dbc;
 
 import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
+import be.kevinbaes.bap.jmetersampler.domain.DeviceEvent;
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.spi.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static be.kevinbaes.bap.jmetersampler.r2dbc.R2dbcTestConfiguration.*;
 
@@ -14,7 +18,7 @@ public class R2dbcTest {
 
   private final R2dbcTestConfiguration config;
   private ConnectionFactory connectionFactory;
-  private final R2dbcGoalRepository goalRepository;
+  private final R2dbcRepository goalRepository;
 
   public R2dbcTest(R2dbcTestConfiguration config, ConnectionOptions connectionOptions) {
     this.config = config;
@@ -25,29 +29,33 @@ public class R2dbcTest {
       this.connectionFactory = connectionUtil.pooledConnectionFactory(connectionFactory);
     }
 
-    this.goalRepository = new R2dbcGoalRepository(connectionFactory);
+    this.goalRepository = new R2dbcRepository(connectionFactory);
 
     LOG.info("Initialized R2DBC test with config [{}]", config);
   }
 
-  public void performDatabaseQueries() {
+  public List<DeviceEvent> performDatabaseQueries() {
     if(config.getQueryType().equals(INSERT)) {
       LOG.info("inserting [{}] times", config.getInsertCount());
 
-      goalRepository.insertSingleConnection(config.getInsertCount()).block();
+      goalRepository.insertSingleConnection(config.getInsertCount(), config.getRetryCount(), config.getRetryDelay()).block();
     } else if (config.getQueryType().equals(INSERT_INTERLEAVE)) {
       LOG.info("inserting [{}] times", config.getInsertCount());
 
-      goalRepository.insertInterleaved(config.getInsertCount()).block();
+      goalRepository.insertInterleaved(config.getInsertCount(), config.getRetryCount(), config.getRetryDelay()).block();
     } else {
       goalRepository
           .select()
+          .collectList()
           .block();
     }
+
+    return new ArrayList<>();
   }
 
   public void testEnded() {
     if(this.config.getDriverType().equals(POOLED)) {
+      LOG.info("closing connection pool");
       ((ConnectionPool)this.connectionFactory).close();
     }
   }

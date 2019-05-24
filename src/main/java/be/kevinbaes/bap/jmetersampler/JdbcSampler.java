@@ -1,6 +1,7 @@
 package be.kevinbaes.bap.jmetersampler;
 
 import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
+import be.kevinbaes.bap.jmetersampler.domain.DeviceEvent;
 import be.kevinbaes.bap.jmetersampler.jdbc.JdbcTest;
 import be.kevinbaes.bap.jmetersampler.jdbc.JdbcTestConfiguration;
 import org.apache.jmeter.config.Arguments;
@@ -14,6 +15,7 @@ import sun.nio.ch.Interruptible;
 
 import java.io.Serializable;
 import java.util.Iterator;
+import java.util.List;
 
 import static be.kevinbaes.bap.jmetersampler.jdbc.JdbcTestConfiguration.UNPOOLED;
 
@@ -64,7 +66,7 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
   }
 
   /**
-   * Get driver configuration parameters and initialze JdbcGoalRepository
+   * Get driver configuration parameters and initialze JdbcRepository
    */
   @Override
   public void setupTest(JavaSamplerContext context) {
@@ -122,7 +124,10 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
       // Execute the sample. In this case sleep for the
       // specified time.
 
-      jdbcTest.performDatabaseQueries();
+      List<DeviceEvent> response = jdbcTest.performDatabaseQueries();
+      if(response != null) {
+        LOG.info("response contained [{}] events", response.size());
+      }
 
       myThread = null;
 

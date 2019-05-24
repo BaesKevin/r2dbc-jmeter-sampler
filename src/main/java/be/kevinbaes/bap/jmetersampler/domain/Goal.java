@@ -1,5 +1,8 @@
 package be.kevinbaes.bap.jmetersampler.domain;
 
+/**
+ * Entity used to test inserts
+ */
 public class Goal {
   private Integer id;
   private String name;

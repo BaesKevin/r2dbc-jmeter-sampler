@@ -1,6 +1,7 @@
 package be.kevinbaes.bap.jmetersampler;
 
 import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
+import be.kevinbaes.bap.jmetersampler.domain.DeviceEvent;
 import be.kevinbaes.bap.jmetersampler.r2dbc.R2dbcTest;
 import be.kevinbaes.bap.jmetersampler.r2dbc.R2dbcTestConfiguration;
 import org.apache.jmeter.config.Arguments;
@@ -14,16 +15,15 @@ import sun.nio.ch.Interruptible;
 
 import java.io.Serializable;
 import java.util.Iterator;
+import java.util.List;
 
 import static be.kevinbaes.bap.jmetersampler.r2dbc.R2dbcTestConfiguration.SELECT;
 
 /**
  * Sampler which can perform a select or N insert queries against a postgres database.
  *
- * This sampler must NOT be used in a threadgroup with more than 1 thread.
- * Instead use multiple samplers or use the loopcount.
- *
- * If you use this sampler wrong, the following error will occur:
+ * Use this sampler with care when using a sampler with more than one thread.
+ * If you are overloading the server, you will get this error:
  * org.postgresql.util.PSQLException: FATAL: sorry, too many clients already
  *
  * The reason no to use threads is that the non-blocking IO makes it so a test
@@ -39,6 +39,9 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
   private static final String DRIVER_TYPE_PARAM = "Driver type";
   private static final String QUERY_TYPE_PARAM = "Query type";
   private static final String INSERT_COUNT_PARAM = "Insert count";
+  private static final String RETRY_COUNT_PARAM = "Retry count";
+  private static final String RETRY_DELAY_PARAM = "Retry delay";
+
 
   private static final String USERNAME_PARAM = "Username";
   private static final String PASSWORD_PARAM = "Password";
@@ -46,6 +49,8 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
   private static final String PORT_PARAM = "Port";
   private static final String DATABASE_PARAM = "Database";
 
+  private static int RETRY_COUNT_DEFAULT = 3;
+  private static int RETRY_DELAY_DEFAULT = 100;
   private static int INSERT_COUNT_DEFAULT = 1;
   private static final String DRIVER_TYPE_DEFAULT = "pooled";
   private static final String USERNAME_DEFAULT = "postgres";
@@ -80,6 +85,8 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
     String driverType = context.getParameter(DRIVER_TYPE_PARAM);
     String queryType = context.getParameter(QUERY_TYPE_PARAM, SELECT);
     int insertCount = context.getIntParameter(INSERT_COUNT_PARAM, INSERT_COUNT_DEFAULT);
+    int retryCount = context.getIntParameter(RETRY_COUNT_PARAM, RETRY_COUNT_DEFAULT);
+    int retryDelay = context.getIntParameter(RETRY_DELAY_PARAM, RETRY_DELAY_DEFAULT);
 
     String username = context.getParameter(USERNAME_PARAM);
     String password = context.getParameter(PASSWORD_PARAM);
@@ -87,9 +94,12 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
     String host = context.getParameter(HOST_PARAM);
     String database = context.getParameter(DATABASE_PARAM);
 
-    ConnectionOptions options = new ConnectionOptions(username, password, port, database, host);
-    r2dbcTest = new R2dbcTest(new R2dbcTestConfiguration(driverType, queryType, insertCount), options);
-
+    try {
+      ConnectionOptions options = new ConnectionOptions(username, password, port, database, host);
+      r2dbcTest = new R2dbcTest(new R2dbcTestConfiguration(driverType, queryType, insertCount, retryCount, retryDelay), options);
+    } catch (Exception e) {
+      LOG.error("something went wrong initializing r2dbctest");
+    }
     samplerName = context.getParameter(TestElement.NAME);
   }
 
@@ -114,15 +124,22 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
       results.sampleStart();
 
       myThread = Thread.currentThread();
-      r2dbcTest.performDatabaseQueries();
-      myThread = null;
+      if(r2dbcTest != null) {
+        List<DeviceEvent> events = r2dbcTest.performDatabaseQueries();
+        LOG.info("results contained [{}] events", events);
+        results.setSuccessful(true);
+      } else {
+        LOG.error("R2dbc test is null");
+        results.setSuccessful(false);
+      }
 
-      results.setSuccessful(true);
+      myThread = null;
     } catch (Exception e) {
       LOG.error("R2dbcTest: error during sample", e);
       results.setSuccessful(false);
       results.setResponseMessage(e.toString());
     } finally {
+      LOG.info("r2dbc test ended");
       results.sampleEnd();
     }
 
@@ -136,7 +153,9 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
 
   @Override
   public void teardownTest(JavaSamplerContext context) {
-    this.r2dbcTest.testEnded();
+    if(this.r2dbcTest != null) {
+      this.r2dbcTest.testEnded();
+    }
   }
 
   /**
@@ -158,6 +177,8 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
     params.addArgument(DRIVER_TYPE_PARAM, DRIVER_TYPE_DEFAULT);
     params.addArgument(QUERY_TYPE_PARAM, SELECT);
     params.addArgument(INSERT_COUNT_PARAM, Integer.toString(INSERT_COUNT_DEFAULT));
+    params.addArgument(RETRY_COUNT_PARAM, Integer.toString(RETRY_COUNT_DEFAULT));
+    params.addArgument(RETRY_DELAY_PARAM, Integer.toString(RETRY_DELAY_DEFAULT));
 
     params.addArgument(USERNAME_PARAM, USERNAME_DEFAULT);
     params.addArgument(PASSWORD_PARAM, "");
