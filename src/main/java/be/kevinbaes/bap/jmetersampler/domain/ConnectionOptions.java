@@ -37,4 +37,14 @@ public class ConnectionOptions {
   public String getHost() {
     return host;
   }
+
+  @Override
+  public String toString() {
+    return "ConnectionOptions{" +
+        "username='" + username + '\'' +
+        ", port=" + port +
+        ", database='" + database + '\'' +
+        ", host='" + host + '\'' +
+        '}';
+  }
 }

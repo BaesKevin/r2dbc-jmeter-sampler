@@ -27,9 +27,9 @@ public class JdbcConnectionUtil {
   public DataSource hikariDataSource() {
     HikariConfig config = new HikariConfig();
     config.setJdbcUrl( getJdbcUrl() );
-    config.setUsername( "postgres" );
-    config.setPassword( "postgres" );
-    config.setMaximumPoolSize(4);
+    config.setUsername( connectionOptions.getUsername() );
+    config.setPassword( connectionOptions.getPassword() );
+    config.setMaximumPoolSize(10);
 
     HikariDataSource hikariDataSource = new HikariDataSource(config);
 

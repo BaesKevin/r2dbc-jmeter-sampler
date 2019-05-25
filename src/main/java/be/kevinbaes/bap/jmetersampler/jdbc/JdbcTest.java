@@ -2,6 +2,7 @@ package be.kevinbaes.bap.jmetersampler.jdbc;
 
 import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
 import be.kevinbaes.bap.jmetersampler.domain.DeviceEvent;
+import org.apache.jmeter.samplers.SampleResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,7 @@ public class JdbcTest {
 
   public JdbcTest(JdbcTestConfiguration configuration, ConnectionOptions connectionOptions) {
     this.configuration = configuration;
+    LOG.info("initialize JDBC test with connection options: [{}]", connectionOptions);
     JdbcConnectionUtil connectionUtil = new JdbcConnectionUtil(connectionOptions);
 
     if(this.configuration.getDriverType().equals(POOLED)) {
@@ -33,15 +35,15 @@ public class JdbcTest {
     this.goalRepository = new JdbcRepository(dataSource);
   }
 
-  public List<DeviceEvent> performDatabaseQueries() throws SQLException {
+  public List<DeviceEvent> performDatabaseQueries(SampleResult sampleResult) throws SQLException {
     if(configuration.getQueryType().equals(INSERT)) {
       LOG.info("inserting [{}] times", configuration.getInsertCount());
 
-      goalRepository.insert(configuration.getInsertCount());
+      goalRepository.insert(configuration.getInsertCount(), sampleResult);
     } else {
       LOG.info("performing select");
 
-      return goalRepository.select();
+      return goalRepository.select(sampleResult);
     }
 
     return new ArrayList<>();

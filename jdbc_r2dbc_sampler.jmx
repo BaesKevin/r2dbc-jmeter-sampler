@@ -14,7 +14,7 @@
           </elementProp>
           <elementProp name="loopcount" elementType="Argument">
             <stringProp name="Argument.name">loopcount</stringProp>
-            <stringProp name="Argument.value">${__P(loops,1)}</stringProp>
+            <stringProp name="Argument.value">${__P(loops,10)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="host" elementType="Argument">
@@ -48,7 +48,7 @@
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
     </TestPlan>
     <hashTree>
-      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
+      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -82,10 +82,10 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename"></stringProp>
+        <stringProp name="filename">D:\Dropbox\howest\s5\bachelor thesis\r2dbc_vs_jdbc\jmeter\aggregate.csv</stringProp>
       </ResultCollector>
       <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="R2DBC: Insert insert interleaved in transaction" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="R2DBC insert interleaved group" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -99,7 +99,7 @@
         <boolProp name="ThreadGroup.delayedStart">true</boolProp>
       </ThreadGroup>
       <hashTree>
-        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="JDBC insert interleaved" enabled="true">
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="R2DBC insert interleaved" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
               <elementProp name="Username" elementType="Argument">
@@ -158,7 +158,7 @@
         </JavaSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="R2DBC: Insert non-interleaved" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="R2DB Insert non-interleaved group" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -230,7 +230,7 @@
         </JavaSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="JDBC insert" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="JDBC insert group" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -289,6 +289,142 @@
             </collectionProp>
           </elementProp>
           <stringProp name="classname">be.kevinbaes.bap.jmetersampler.JdbcSampler</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="JDBC select group" enabled="true">
+        <stringProp name="TestPlan.comments"> </stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">${loopcount}</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="JDBC select" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="Username" elementType="Argument">
+                <stringProp name="Argument.name">Username</stringProp>
+                <stringProp name="Argument.value">${username}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Password" elementType="Argument">
+                <stringProp name="Argument.name">Password</stringProp>
+                <stringProp name="Argument.value">${password}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Host" elementType="Argument">
+                <stringProp name="Argument.name">Host</stringProp>
+                <stringProp name="Argument.value">${host}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Port" elementType="Argument">
+                <stringProp name="Argument.name">Port</stringProp>
+                <stringProp name="Argument.value">${port}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Database" elementType="Argument">
+                <stringProp name="Argument.name">Database</stringProp>
+                <stringProp name="Argument.value">${database}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Driver type" elementType="Argument">
+                <stringProp name="Argument.name">Driver type</stringProp>
+                <stringProp name="Argument.value">pooled</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Query type" elementType="Argument">
+                <stringProp name="Argument.name">Query type</stringProp>
+                <stringProp name="Argument.value">select</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Insert count" elementType="Argument">
+                <stringProp name="Argument.name">Insert count</stringProp>
+                <stringProp name="Argument.value">1</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">be.kevinbaes.bap.jmetersampler.JdbcSampler</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="R2DBC select group" enabled="true">
+        <stringProp name="TestPlan.comments"> </stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">${loopcount}</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="R2DBC select" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="Username" elementType="Argument">
+                <stringProp name="Argument.name">Username</stringProp>
+                <stringProp name="Argument.value">${username}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Password" elementType="Argument">
+                <stringProp name="Argument.name">Password</stringProp>
+                <stringProp name="Argument.value">${password}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Host" elementType="Argument">
+                <stringProp name="Argument.name">Host</stringProp>
+                <stringProp name="Argument.value">${host}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Port" elementType="Argument">
+                <stringProp name="Argument.name">Port</stringProp>
+                <stringProp name="Argument.value">${port}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Database" elementType="Argument">
+                <stringProp name="Argument.name">Database</stringProp>
+                <stringProp name="Argument.value">${database}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Driver type" elementType="Argument">
+                <stringProp name="Argument.name">Driver type</stringProp>
+                <stringProp name="Argument.value">pooled</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Query type" elementType="Argument">
+                <stringProp name="Argument.name">Query type</stringProp>
+                <stringProp name="Argument.value">select</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Insert count" elementType="Argument">
+                <stringProp name="Argument.name">Insert count</stringProp>
+                <stringProp name="Argument.value">1</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Retry count" elementType="Argument">
+                <stringProp name="Argument.name">Retry count</stringProp>
+                <stringProp name="Argument.value">3</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Retry delay" elementType="Argument">
+                <stringProp name="Argument.name">Retry delay</stringProp>
+                <stringProp name="Argument.value">100</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">be.kevinbaes.bap.jmetersampler.R2dbcSampler</stringProp>
         </JavaSampler>
         <hashTree/>
       </hashTree>

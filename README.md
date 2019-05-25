@@ -14,7 +14,7 @@ Open the file in the JMeter ui to see the exact config of every sampler.
 
 Assuming that JMeter bin directory is on the path, use this command to run the tests in non-gui mode.
 This command will run the testplan against a local database and append the results to results.csv.
-This file does not have to exist.
+This file does not have to exist. Log output is in a file jmeter.log, usefull when the tests fail.
 
 ```
  jmeter -n -t jdbc_r2dbc_sampler.jmx -l results.csv -Jloops=10 -Jinserts=

@@ -74,7 +74,11 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
 
     LOG.info("insert count: " + insertCount);
 
-    this.jdbcTest = new JdbcTest(new JdbcTestConfiguration(driverType, queryType, insertCount), options);
+    try{
+      this.jdbcTest = new JdbcTest(new JdbcTestConfiguration(driverType, queryType, insertCount), options);
+    } catch (Exception e) {
+      LOG.error("something went wrong initializing JDBC test", e);
+    }
     name = context.getParameter(TestElement.NAME);
   }
 
@@ -109,7 +113,7 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
       // Execute the sample. In this case sleep for the
       // specified time.
 
-      List<DeviceEvent> response = jdbcTest.performDatabaseQueries();
+      List<DeviceEvent> response = jdbcTest.performDatabaseQueries(results);
       if(response != null) {
         LOG.info("response contained [{}] events", response.size());
       }

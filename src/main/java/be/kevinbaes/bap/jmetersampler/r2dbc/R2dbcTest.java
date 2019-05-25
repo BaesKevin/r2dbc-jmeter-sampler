@@ -4,6 +4,7 @@ import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
 import be.kevinbaes.bap.jmetersampler.domain.DeviceEvent;
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.spi.ConnectionFactory;
+import org.apache.jmeter.samplers.SampleResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,7 @@ public class R2dbcTest {
 
   public R2dbcTest(R2dbcTestConfiguration config, ConnectionOptions connectionOptions) {
     this.config = config;
+    LOG.info("initialize R2DBC test with connection options: [{}]", connectionOptions);
     R2dbcConnectionUtil connectionUtil = new R2dbcConnectionUtil(connectionOptions);
     this.connectionFactory = connectionUtil.postgresConnectionFactory();
 
@@ -34,18 +36,18 @@ public class R2dbcTest {
     LOG.info("Initialized R2DBC test with config [{}]", config);
   }
 
-  public List<DeviceEvent> performDatabaseQueries() {
+  public List<DeviceEvent> performDatabaseQueries(SampleResult result) {
     if(config.getQueryType().equals(INSERT)) {
       LOG.info("inserting [{}] times", config.getInsertCount());
 
-      goalRepository.insertSequential(config.getInsertCount(), config.getRetryCount(), config.getRetryDelay()).block();
+      goalRepository.insertSequential(config.getInsertCount(), config.getRetryCount(), config.getRetryDelay(), result).block();
     } else if (config.getQueryType().equals(INSERT_INTERLEAVE)) {
       LOG.info("inserting [{}] times", config.getInsertCount());
 
-      goalRepository.insertInterleaved(config.getInsertCount(), config.getRetryCount(), config.getRetryDelay()).block();
+      goalRepository.insertInterleaved(config.getInsertCount(), config.getRetryCount(), config.getRetryDelay(), result).block();
     } else {
       goalRepository
-          .select()
+          .select(result)
           .collectList()
           .block();
     }

@@ -21,10 +21,10 @@ public class R2dbcConnectionUtil {
 
   public ConnectionPool pooledConnectionFactory(ConnectionFactory baseFactory) {
     ConnectionPoolConfiguration configuration = ConnectionPoolConfiguration.builder(baseFactory)
-        .initialSize(4)
+        .initialSize(10)
         .validationQuery("SELECT 1")
         .maxIdleTime(Duration.ofMillis(1000))
-        .maxSize(4)
+        .maxSize(10)
         .build();
 
 

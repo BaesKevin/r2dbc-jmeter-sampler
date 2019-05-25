@@ -1,6 +1,7 @@
 package be.kevinbaes.bap.jmetersampler.jdbc;
 
 import be.kevinbaes.bap.jmetersampler.domain.DeviceEvent;
+import org.apache.jmeter.samplers.SampleResult;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -15,12 +16,13 @@ public class JdbcRepository {
     this.dataSource = dataSource;
   }
 
-  public List<DeviceEvent> select() throws SQLException {
+  public List<DeviceEvent> select(SampleResult sampleResult) throws SQLException {
     List<DeviceEvent> events = new ArrayList<>();
     Connection conn = null;
     try {
 
       conn = dataSource.getConnection();
+      sampleResult.connectEnd();
       Statement stmt = conn.createStatement();
       ResultSet resultSet = null;
 
@@ -61,13 +63,13 @@ public class JdbcRepository {
     return events;
   }
 
-  public void insert(int count) throws SQLException {
+  public void insert(int count, SampleResult sampleResult) throws SQLException {
 
     Connection conn = null;
     try {
 
       conn = dataSource.getConnection();
-
+      sampleResult.connectEnd();
       for (int i = 0; i < count; i++) {
         PreparedStatement stmt = null;
         try {

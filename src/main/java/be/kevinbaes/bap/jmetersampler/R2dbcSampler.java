@@ -78,7 +78,7 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
       ConnectionOptions options = setupUtil.connectionOptions(context);
       r2dbcTest = new R2dbcTest(new R2dbcTestConfiguration(driverType, queryType, insertCount, retryCount, retryDelay), options);
     } catch (Exception e) {
-      LOG.error("something went wrong initializing r2dbctest");
+      LOG.error("something went wrong initializing r2dbctest", e);
     }
     samplerName = context.getParameter(TestElement.NAME);
   }
@@ -105,7 +105,7 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
 
       myThread = Thread.currentThread();
       if(r2dbcTest != null) {
-        List<DeviceEvent> events = r2dbcTest.performDatabaseQueries();
+        List<DeviceEvent> events = r2dbcTest.performDatabaseQueries(results);
         LOG.info("results contained [{}] events", events);
         results.setSuccessful(true);
       } else {
