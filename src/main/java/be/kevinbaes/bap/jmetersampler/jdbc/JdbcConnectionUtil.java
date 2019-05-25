@@ -7,14 +7,14 @@ import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
 
-public class JdbcConnectionUtil {
+class JdbcConnectionUtil {
   private final ConnectionOptions connectionOptions;
 
-  public JdbcConnectionUtil(ConnectionOptions connectionOptions) {
+  JdbcConnectionUtil(ConnectionOptions connectionOptions) {
     this.connectionOptions = connectionOptions;
   }
 
-  public DataSource postgresDataSource() {
+  DataSource postgresDataSource() {
     PGSimpleDataSource dataSource = new PGSimpleDataSource();
 
     dataSource.setUrl(getJdbcUrl());
@@ -24,16 +24,14 @@ public class JdbcConnectionUtil {
     return dataSource;
   }
 
-  public DataSource hikariDataSource() {
+  DataSource hikariDataSource() {
     HikariConfig config = new HikariConfig();
     config.setJdbcUrl( getJdbcUrl() );
     config.setUsername( connectionOptions.getUsername() );
     config.setPassword( connectionOptions.getPassword() );
     config.setMaximumPoolSize(10);
 
-    HikariDataSource hikariDataSource = new HikariDataSource(config);
-
-    return hikariDataSource;
+    return new HikariDataSource(config);
   }
 
   // TODO discuss driver url differences in paper

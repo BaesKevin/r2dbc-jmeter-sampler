@@ -1,7 +1,6 @@
 package be.kevinbaes.bap.jmetersampler;
 
 import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
-import be.kevinbaes.bap.jmetersampler.domain.DeviceEvent;
 import be.kevinbaes.bap.jmetersampler.r2dbc.R2dbcTest;
 import be.kevinbaes.bap.jmetersampler.r2dbc.R2dbcTestConfiguration;
 import org.apache.jmeter.config.Arguments;
@@ -105,7 +104,7 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
 
       myThread = Thread.currentThread();
       if(r2dbcTest != null) {
-        List<DeviceEvent> events = r2dbcTest.performDatabaseQueries(results);
+        List<?> events = r2dbcTest.performDatabaseQueries(results);
         LOG.info("results contained [{}] events", events);
         results.setSuccessful(true);
       } else {

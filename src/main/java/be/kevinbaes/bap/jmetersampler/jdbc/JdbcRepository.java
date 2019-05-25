@@ -1,33 +1,34 @@
 package be.kevinbaes.bap.jmetersampler.jdbc;
 
+import be.kevinbaes.bap.jmetersampler.Repository;
 import be.kevinbaes.bap.jmetersampler.domain.DeviceEvent;
 import org.apache.jmeter.samplers.SampleResult;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcRepository {
+public class JdbcRepository implements Repository<DeviceEvent> {
 
   private final DataSource dataSource;
+  private final JdbcTestConfiguration jdbcTestConfiguration;
 
-  public JdbcRepository(DataSource dataSource) {
+  JdbcRepository(DataSource dataSource, JdbcTestConfiguration jdbcTestConfiguration) {
     this.dataSource = dataSource;
+    this.jdbcTestConfiguration = jdbcTestConfiguration;
   }
 
-  public List<DeviceEvent> select(SampleResult sampleResult) throws SQLException {
+  public List<DeviceEvent> select(SampleResult sampleResult) {
     List<DeviceEvent> events = new ArrayList<>();
     Connection conn = null;
     try {
 
       conn = dataSource.getConnection();
       sampleResult.connectEnd();
-      Statement stmt = conn.createStatement();
-      ResultSet resultSet = null;
 
-      try {
-        resultSet = stmt.executeQuery("select * from device_event");
+      try (Statement stmt = conn.createStatement(); ResultSet resultSet = stmt.executeQuery("select * from device_event")) {
 
         while (resultSet.next()) {
           int id = resultSet.getInt("id");
@@ -42,13 +43,6 @@ public class JdbcRepository {
         stmt.close();
       } catch (SQLException e) {
         e.printStackTrace();
-      } finally {
-        if (stmt != null) {
-          stmt.close();
-        }
-        if (resultSet != null) {
-          resultSet.close();
-        }
       }
 
       conn.close();
@@ -56,24 +50,27 @@ public class JdbcRepository {
       e.printStackTrace();
     } finally {
       if (conn != null) {
-        conn.close();
+        try{
+          conn.close();
+        } catch (SQLException s) {
+          // rethrow as to not swallow exceptions
+          throw new RuntimeException(s);
+        }
       }
     }
 
     return events;
   }
 
-  public void insert(int count, SampleResult sampleResult) throws SQLException {
+  public void insertSequential(SampleResult sampleResult) {
 
     Connection conn = null;
     try {
 
       conn = dataSource.getConnection();
       sampleResult.connectEnd();
-      for (int i = 0; i < count; i++) {
-        PreparedStatement stmt = null;
-        try {
-          stmt = conn.prepareStatement("insert into goal (name) values (?)");
+      for (int i = 0; i < jdbcTestConfiguration.getInsertCount(); i++) {
+        try (PreparedStatement stmt = conn.prepareStatement("insert into goal (name) values (?)")) {
           stmt.setString(1, "goal" + i);
 
           int updateCount = stmt.executeUpdate();
@@ -81,10 +78,6 @@ public class JdbcRepository {
           stmt.close();
         } catch (SQLException e) {
           e.printStackTrace();
-        } finally {
-          if (stmt != null) {
-            stmt.close();
-          }
         }
       }
 
@@ -93,8 +86,18 @@ public class JdbcRepository {
       e.printStackTrace();
     } finally {
       if (conn != null) {
-        conn.close();
+        try{
+          conn.close();
+        } catch (SQLException s) {
+          // rethrow as to not swallow exceptions
+          throw new RuntimeException(s);
+        }
       }
     }
+  }
+
+  @Override
+  public void insertInterleaved(SampleResult sampleResult) {
+    throw new NotImplementedException();
   }
 }

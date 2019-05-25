@@ -1,7 +1,6 @@
 package be.kevinbaes.bap.jmetersampler;
 
 import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
-import be.kevinbaes.bap.jmetersampler.domain.DeviceEvent;
 import be.kevinbaes.bap.jmetersampler.jdbc.JdbcTest;
 import be.kevinbaes.bap.jmetersampler.jdbc.JdbcTestConfiguration;
 import org.apache.jmeter.config.Arguments;
@@ -113,7 +112,7 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
       // Execute the sample. In this case sleep for the
       // specified time.
 
-      List<DeviceEvent> response = jdbcTest.performDatabaseQueries(results);
+      List<?> response = jdbcTest.performDatabaseQueries(results);
       if(response != null) {
         LOG.info("response contained [{}] events", response.size());
       }

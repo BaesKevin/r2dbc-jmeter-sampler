@@ -1,7 +1,7 @@
 package be.kevinbaes.bap.jmetersampler.r2dbc;
 
+import be.kevinbaes.bap.jmetersampler.Repository;
 import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
-import be.kevinbaes.bap.jmetersampler.domain.DeviceEvent;
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.spi.ConnectionFactory;
 import org.apache.jmeter.samplers.SampleResult;
@@ -19,7 +19,7 @@ public class R2dbcTest {
 
   private final R2dbcTestConfiguration config;
   private ConnectionFactory connectionFactory;
-  private final R2dbcRepository goalRepository;
+  private final Repository<?> repository;
 
   public R2dbcTest(R2dbcTestConfiguration config, ConnectionOptions connectionOptions) {
     this.config = config;
@@ -31,25 +31,22 @@ public class R2dbcTest {
       this.connectionFactory = connectionUtil.pooledConnectionFactory(connectionFactory);
     }
 
-    this.goalRepository = new R2dbcRepository(connectionFactory);
+    this.repository = new R2dbcRepository(connectionFactory, config);
 
     LOG.info("Initialized R2DBC test with config [{}]", config);
   }
 
-  public List<DeviceEvent> performDatabaseQueries(SampleResult result) {
+  public List<?> performDatabaseQueries(SampleResult result) {
     if(config.getQueryType().equals(INSERT)) {
-      LOG.info("inserting [{}] times", config.getInsertCount());
+      LOG.info("inserting [{}] times sequential", config.getInsertCount());
 
-      goalRepository.insertSequential(config.getInsertCount(), config.getRetryCount(), config.getRetryDelay(), result).block();
+      repository.insertSequential(result);
     } else if (config.getQueryType().equals(INSERT_INTERLEAVE)) {
-      LOG.info("inserting [{}] times", config.getInsertCount());
+      LOG.info("inserting [{}] times interleaved", config.getInsertCount());
 
-      goalRepository.insertInterleaved(config.getInsertCount(), config.getRetryCount(), config.getRetryDelay(), result).block();
+      repository.insertInterleaved(result);
     } else {
-      goalRepository
-          .select(result)
-          .collectList()
-          .block();
+      repository.select(result);
     }
 
     return new ArrayList<>();

@@ -1,13 +1,12 @@
 package be.kevinbaes.bap.jmetersampler.jdbc;
 
+import be.kevinbaes.bap.jmetersampler.Repository;
 import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
-import be.kevinbaes.bap.jmetersampler.domain.DeviceEvent;
 import org.apache.jmeter.samplers.SampleResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class JdbcTest {
 
   private JdbcTestConfiguration configuration;
   private DataSource dataSource;
-  private JdbcRepository goalRepository;
+  private Repository<?> goalRepository;
 
   public JdbcTest(JdbcTestConfiguration configuration, ConnectionOptions connectionOptions) {
     this.configuration = configuration;
@@ -32,14 +31,14 @@ public class JdbcTest {
       this.dataSource = connectionUtil.postgresDataSource();
     }
 
-    this.goalRepository = new JdbcRepository(dataSource);
+    this.goalRepository = new JdbcRepository(dataSource, configuration);
   }
 
-  public List<DeviceEvent> performDatabaseQueries(SampleResult sampleResult) throws SQLException {
+  public List<?> performDatabaseQueries(SampleResult sampleResult) {
     if(configuration.getQueryType().equals(INSERT)) {
       LOG.info("inserting [{}] times", configuration.getInsertCount());
 
-      goalRepository.insert(configuration.getInsertCount(), sampleResult);
+      goalRepository.insertSequential(sampleResult);
     } else {
       LOG.info("performing select");
 

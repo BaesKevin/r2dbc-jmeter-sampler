@@ -27,8 +27,6 @@ public class R2dbcConnectionUtil {
         .maxSize(10)
         .build();
 
-
-
     return new ConnectionPool(configuration);
   }
 

@@ -1,12 +1,17 @@
-package be.kevinbaes.bap.jmetersampler.r2dbc;
+package be.kevinbaes.bap.jmetersampler;
 
 import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
+import be.kevinbaes.bap.jmetersampler.r2dbc.QueryUtil;
+import be.kevinbaes.bap.jmetersampler.r2dbc.R2dbcConnectionUtil;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Utility runner class which can be used to seed 100k events into the device_event table, does so almost instantly.
+ */
 public class SeedDeviceEvent {
 
   private QueryUtil queryUtil;
@@ -27,9 +32,7 @@ public class SeedDeviceEvent {
     Mono<Integer> rowsUpdatedAfterBatchInsert = queryUtil.executeStatement(
         (connection) -> createInsertBatch(connection).execute())
           .flatMap(result -> Mono.from(result.getRowsUpdated()))
-          .reduce(0, (total, singleQueryRowsUpdated) -> {
-            return total + singleQueryRowsUpdated;
-          });
+          .reduce(0, Integer::sum);
 
     System.out.println("rows updated after batch: " + rowsUpdatedAfterBatchInsert.block());
 
