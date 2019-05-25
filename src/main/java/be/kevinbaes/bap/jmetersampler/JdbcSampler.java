@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
+import static be.kevinbaes.bap.jmetersampler.SamplerSetupUtil.*;
 import static be.kevinbaes.bap.jmetersampler.jdbc.JdbcTestConfiguration.UNPOOLED;
 
 /**
@@ -29,25 +30,13 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
 
   private static final Logger LOG = LoggerFactory.getLogger(JdbcSampler.class);
 
-  private static final String DRIVER_TYPE_PARAM = "Driver type";
-  private static final String QUERY_TYPE_PARAM = "Query type";
-  private static final String INSERT_COUNT_PARAM = "Insert count";
-
   private static final String INSERT = "insert";
   private static final String SELECT = "select";
 
-  private static final String USERNAME_PARAM = "Username";
-  private static final String PASSWORD_PARAM = "Password";
-  private static final String HOST_PARAM = "Host";
-  private static final String PORT_PARAM = "Port";
-  private static final String DATABASE_PARAM = "Database";
 
   private static int INSERT_COUNT_DEFAULT = 1;
   private static final String DRIVER_TYPE_DEFAULT = UNPOOLED;
-  private static final String USERNAME_DEFAULT = "postgres";
-  private static final String HOST_DEFAULT = "localhost";
-  private static final int PORT_DEFAULT = 5432;
-  private static final String DATABASE_DEFAULT = "postgres";
+
 
 
   // The name of the sampler
@@ -56,12 +45,14 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
   private transient volatile Thread myThread;
 
   private JdbcTest jdbcTest;
+  private final SamplerSetupUtil setupUtil;
 
   /**
    * The Java Sampler uses the default constructor to instantiate an instance
    * of the client class.
    */
   public JdbcSampler() {
+    setupUtil = new SamplerSetupUtil();
     LOG.debug(whoAmI() + "\tConstruct");
   }
 
@@ -79,13 +70,7 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
     String queryType = context.getParameter(QUERY_TYPE_PARAM, SELECT);
     int insertCount = context.getIntParameter(INSERT_COUNT_PARAM, INSERT_COUNT_DEFAULT);
 
-    String username = context.getParameter(USERNAME_PARAM);
-    String password = context.getParameter(PASSWORD_PARAM);
-    int port = context.getIntParameter(PORT_PARAM);
-    String host = context.getParameter(HOST_PARAM);
-    String database = context.getParameter(DATABASE_PARAM);
-
-    ConnectionOptions options = new ConnectionOptions(username, password, port, database, host);
+    ConnectionOptions options = setupUtil.connectionOptions(context);
 
     LOG.info("insert count: " + insertCount);
 
@@ -162,17 +147,11 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
    */
   @Override
   public Arguments getDefaultParameters() {
-    Arguments params = new Arguments();
+    Arguments params = new SamplerSetupUtil().defaultArguments();
 
     params.addArgument(DRIVER_TYPE_PARAM, UNPOOLED);
     params.addArgument(QUERY_TYPE_PARAM, SELECT);
     params.addArgument(INSERT_COUNT_PARAM, Integer.toString(INSERT_COUNT_DEFAULT));
-
-    params.addArgument(USERNAME_PARAM, USERNAME_DEFAULT);
-    params.addArgument(PASSWORD_PARAM, "");
-    params.addArgument(HOST_PARAM, HOST_DEFAULT);
-    params.addArgument(PORT_PARAM, Integer.toString(PORT_DEFAULT));
-    params.addArgument(DATABASE_PARAM, DATABASE_DEFAULT);
 
     return params;
   }

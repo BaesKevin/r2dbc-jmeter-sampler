@@ -17,6 +17,31 @@
             <stringProp name="Argument.value">${__P(loops,1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="host" elementType="Argument">
+            <stringProp name="Argument.name">host</stringProp>
+            <stringProp name="Argument.value">${__P(host, localhost)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="port" elementType="Argument">
+            <stringProp name="Argument.name">port</stringProp>
+            <stringProp name="Argument.value">${__P(port, 5432)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="database" elementType="Argument">
+            <stringProp name="Argument.name">database</stringProp>
+            <stringProp name="Argument.value">${__P(database,postgres)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="username" elementType="Argument">
+            <stringProp name="Argument.name">username</stringProp>
+            <stringProp name="Argument.value">${__P(user,postgres)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="password" elementType="Argument">
+            <stringProp name="Argument.name">password</stringProp>
+            <stringProp name="Argument.value">${__P(password,postgres)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
         </collectionProp>
       </elementProp>
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
@@ -77,6 +102,31 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="JDBC insert interleaved" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="Username" elementType="Argument">
+                <stringProp name="Argument.name">Username</stringProp>
+                <stringProp name="Argument.value">${username}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Password" elementType="Argument">
+                <stringProp name="Argument.name">Password</stringProp>
+                <stringProp name="Argument.value">${password}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Host" elementType="Argument">
+                <stringProp name="Argument.name">Host</stringProp>
+                <stringProp name="Argument.value">${host}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Port" elementType="Argument">
+                <stringProp name="Argument.name">Port</stringProp>
+                <stringProp name="Argument.value">${port}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Database" elementType="Argument">
+                <stringProp name="Argument.name">Database</stringProp>
+                <stringProp name="Argument.value">${database}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="Driver type" elementType="Argument">
                 <stringProp name="Argument.name">Driver type</stringProp>
                 <stringProp name="Argument.value">pooled</stringProp>
@@ -102,31 +152,6 @@
                 <stringProp name="Argument.value">100</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="Username" elementType="Argument">
-                <stringProp name="Argument.name">Username</stringProp>
-                <stringProp name="Argument.value">postgres</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Password" elementType="Argument">
-                <stringProp name="Argument.name">Password</stringProp>
-                <stringProp name="Argument.value">postgres</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Host" elementType="Argument">
-                <stringProp name="Argument.name">Host</stringProp>
-                <stringProp name="Argument.value">localhost</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Port" elementType="Argument">
-                <stringProp name="Argument.name">Port</stringProp>
-                <stringProp name="Argument.value">5432</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Database" elementType="Argument">
-                <stringProp name="Argument.name">Database</stringProp>
-                <stringProp name="Argument.value">postgres</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
             </collectionProp>
           </elementProp>
           <stringProp name="classname">be.kevinbaes.bap.jmetersampler.R2dbcSampler</stringProp>
@@ -149,6 +174,31 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="R2DBC sequential insert" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="Username" elementType="Argument">
+                <stringProp name="Argument.name">Username</stringProp>
+                <stringProp name="Argument.value">${username}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Password" elementType="Argument">
+                <stringProp name="Argument.name">Password</stringProp>
+                <stringProp name="Argument.value">${password}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Host" elementType="Argument">
+                <stringProp name="Argument.name">Host</stringProp>
+                <stringProp name="Argument.value">${host}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Port" elementType="Argument">
+                <stringProp name="Argument.name">Port</stringProp>
+                <stringProp name="Argument.value">${port}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Database" elementType="Argument">
+                <stringProp name="Argument.name">Database</stringProp>
+                <stringProp name="Argument.value">${database}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="Driver type" elementType="Argument">
                 <stringProp name="Argument.name">Driver type</stringProp>
                 <stringProp name="Argument.value">pooled</stringProp>
@@ -174,31 +224,6 @@
                 <stringProp name="Argument.value">100</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="Username" elementType="Argument">
-                <stringProp name="Argument.name">Username</stringProp>
-                <stringProp name="Argument.value">postgres</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Password" elementType="Argument">
-                <stringProp name="Argument.name">Password</stringProp>
-                <stringProp name="Argument.value">postgres</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Host" elementType="Argument">
-                <stringProp name="Argument.name">Host</stringProp>
-                <stringProp name="Argument.value">localhost</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Port" elementType="Argument">
-                <stringProp name="Argument.name">Port</stringProp>
-                <stringProp name="Argument.value">5432</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Database" elementType="Argument">
-                <stringProp name="Argument.name">Database</stringProp>
-                <stringProp name="Argument.value">postgres</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
             </collectionProp>
           </elementProp>
           <stringProp name="classname">be.kevinbaes.bap.jmetersampler.R2dbcSampler</stringProp>
@@ -221,6 +246,31 @@
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="JDBC sequenctial insert" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="Username" elementType="Argument">
+                <stringProp name="Argument.name">Username</stringProp>
+                <stringProp name="Argument.value">${username}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Password" elementType="Argument">
+                <stringProp name="Argument.name">Password</stringProp>
+                <stringProp name="Argument.value">${password}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Host" elementType="Argument">
+                <stringProp name="Argument.name">Host</stringProp>
+                <stringProp name="Argument.value">${host}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Port" elementType="Argument">
+                <stringProp name="Argument.name">Port</stringProp>
+                <stringProp name="Argument.value">${port}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="Database" elementType="Argument">
+                <stringProp name="Argument.name">Database</stringProp>
+                <stringProp name="Argument.value">${database}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="Driver type" elementType="Argument">
                 <stringProp name="Argument.name">Driver type</stringProp>
                 <stringProp name="Argument.value">pooled</stringProp>
@@ -234,31 +284,6 @@
               <elementProp name="Insert count" elementType="Argument">
                 <stringProp name="Argument.name">Insert count</stringProp>
                 <stringProp name="Argument.value">${insertcount}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Username" elementType="Argument">
-                <stringProp name="Argument.name">Username</stringProp>
-                <stringProp name="Argument.value">postgres</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Password" elementType="Argument">
-                <stringProp name="Argument.name">Password</stringProp>
-                <stringProp name="Argument.value">postgres</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Host" elementType="Argument">
-                <stringProp name="Argument.name">Host</stringProp>
-                <stringProp name="Argument.value">localhost</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Port" elementType="Argument">
-                <stringProp name="Argument.name">Port</stringProp>
-                <stringProp name="Argument.value">5432</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="Database" elementType="Argument">
-                <stringProp name="Argument.name">Database</stringProp>
-                <stringProp name="Argument.value">postgres</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>

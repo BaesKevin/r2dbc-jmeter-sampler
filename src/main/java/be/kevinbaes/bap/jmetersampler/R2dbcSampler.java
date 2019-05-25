@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
+import static be.kevinbaes.bap.jmetersampler.SamplerSetupUtil.*;
 import static be.kevinbaes.bap.jmetersampler.r2dbc.R2dbcTestConfiguration.SELECT;
 
 /**
@@ -36,31 +37,15 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
 
   private static final Logger LOG = LoggerFactory.getLogger(R2dbcSampler.class);
 
-  private static final String DRIVER_TYPE_PARAM = "Driver type";
-  private static final String QUERY_TYPE_PARAM = "Query type";
-  private static final String INSERT_COUNT_PARAM = "Insert count";
-  private static final String RETRY_COUNT_PARAM = "Retry count";
-  private static final String RETRY_DELAY_PARAM = "Retry delay";
-
-
-  private static final String USERNAME_PARAM = "Username";
-  private static final String PASSWORD_PARAM = "Password";
-  private static final String HOST_PARAM = "Host";
-  private static final String PORT_PARAM = "Port";
-  private static final String DATABASE_PARAM = "Database";
-
   private static int RETRY_COUNT_DEFAULT = 3;
   private static int RETRY_DELAY_DEFAULT = 100;
   private static int INSERT_COUNT_DEFAULT = 1;
   private static final String DRIVER_TYPE_DEFAULT = "pooled";
-  private static final String USERNAME_DEFAULT = "postgres";
-  private static final String HOST_DEFAULT = "localhost";
-  private static final int PORT_DEFAULT = 5432;
-  private static final String DATABASE_DEFAULT = "postgres";
 
   private String samplerName;
 
   private R2dbcTest r2dbcTest;
+  private final SamplerSetupUtil setupUtil;
 
   private transient volatile Thread myThread;
 
@@ -69,6 +54,7 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
    * of the client class.
    */
   public R2dbcSampler() {
+    setupUtil = new SamplerSetupUtil();
     LOG.debug(whoAmI() + "\tConstruct");
   }
 
@@ -88,14 +74,8 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
     int retryCount = context.getIntParameter(RETRY_COUNT_PARAM, RETRY_COUNT_DEFAULT);
     int retryDelay = context.getIntParameter(RETRY_DELAY_PARAM, RETRY_DELAY_DEFAULT);
 
-    String username = context.getParameter(USERNAME_PARAM);
-    String password = context.getParameter(PASSWORD_PARAM);
-    int port = context.getIntParameter(PORT_PARAM);
-    String host = context.getParameter(HOST_PARAM);
-    String database = context.getParameter(DATABASE_PARAM);
-
     try {
-      ConnectionOptions options = new ConnectionOptions(username, password, port, database, host);
+      ConnectionOptions options = setupUtil.connectionOptions(context);
       r2dbcTest = new R2dbcTest(new R2dbcTestConfiguration(driverType, queryType, insertCount, retryCount, retryDelay), options);
     } catch (Exception e) {
       LOG.error("something went wrong initializing r2dbctest");
@@ -172,19 +152,13 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
    */
   @Override
   public Arguments getDefaultParameters() {
-    Arguments params = new Arguments();
+    Arguments params = setupUtil.defaultArguments();
 
     params.addArgument(DRIVER_TYPE_PARAM, DRIVER_TYPE_DEFAULT);
     params.addArgument(QUERY_TYPE_PARAM, SELECT);
     params.addArgument(INSERT_COUNT_PARAM, Integer.toString(INSERT_COUNT_DEFAULT));
     params.addArgument(RETRY_COUNT_PARAM, Integer.toString(RETRY_COUNT_DEFAULT));
     params.addArgument(RETRY_DELAY_PARAM, Integer.toString(RETRY_DELAY_DEFAULT));
-
-    params.addArgument(USERNAME_PARAM, USERNAME_DEFAULT);
-    params.addArgument(PASSWORD_PARAM, "");
-    params.addArgument(HOST_PARAM, HOST_DEFAULT);
-    params.addArgument(PORT_PARAM, Integer.toString(PORT_DEFAULT));
-    params.addArgument(DATABASE_PARAM, DATABASE_DEFAULT);
 
     return params;
   }

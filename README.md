@@ -13,14 +13,18 @@ Test plan contents:
 Open the file in the JMeter ui to see the exact config of every sampler.
 
 Assuming that JMeter bin directory is on the path, use this command to run the tests in non-gui mode.
+This command will run the testplan against a local database and append the results to results.csv.
+This file does not have to exist.
 
 ```
-jmeter -n -t r2dbc_sampler.jmx -l results.csv -Jloops=10 -Jinserts=10
+ jmeter -n -t jdbc_r2dbc_sampler.jmx -l results.csv -Jloops=10 -Jinserts=
+10 -Juser=postgres -Jpassword=postgres -Jhost=localhost -Jport=5432 -Jdatabase=postgres
 ```
 
 Loops configures how many times every individual test runs, default 1.
 Inserts configures how many insert query to perform, default 10.
-Defaults are small as to not accidentally overload a server.
+All database defaults are the same as the values in the command.
+Defaults for loops and inserts are small as to not accidentally overload a server.
 
 See [non-gui mode](https://jmeter.apache.org/usermanual/get-started.html#non_gui) and  [variables](https://jmeter.apache.org/usermanual/test_plan.html#using_variables) 
 for an explanation on the paramters.
