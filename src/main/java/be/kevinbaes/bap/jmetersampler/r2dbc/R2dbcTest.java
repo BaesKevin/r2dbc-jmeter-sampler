@@ -38,7 +38,7 @@ public class R2dbcTest {
     if(config.getQueryType().equals(INSERT)) {
       LOG.info("inserting [{}] times", config.getInsertCount());
 
-      goalRepository.insertSingleConnection(config.getInsertCount(), config.getRetryCount(), config.getRetryDelay()).block();
+      goalRepository.insertSequential(config.getInsertCount(), config.getRetryCount(), config.getRetryDelay()).block();
     } else if (config.getQueryType().equals(INSERT_INTERLEAVE)) {
       LOG.info("inserting [{}] times", config.getInsertCount());
 

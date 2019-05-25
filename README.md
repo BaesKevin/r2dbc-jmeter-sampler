@@ -3,7 +3,29 @@
 This class library contains two classes which extend from JavaSamplerClient: JdbcSampler and R2dbcSampler.
 Maven is required to build the class library. 
 
-## Usage
+## Running the .jmx file
+
+Test plan contents:
+* r2dbc insert test with interleaved queries
+* r2dbc insert test with sequential queries
+* jdbc insert test with sequential queries
+
+Open the file in the JMeter ui to see the exact config of every sampler.
+
+Assuming that JMeter bin directory is on the path, use this command to run the tests in non-gui mode.
+
+```
+jmeter -n -t r2dbc_sampler.jmx -l results.csv -Jloops=10 -Jinserts=10
+```
+
+Loops configures how many times every individual test runs, default 1.
+Inserts configures how many insert query to perform, default 10.
+Defaults are small as to not accidentally overload a server.
+
+See [non-gui mode](https://jmeter.apache.org/usermanual/get-started.html#non_gui) and  [variables](https://jmeter.apache.org/usermanual/test_plan.html#using_variables) 
+for an explanation on the paramters.
+
+## Build and include in JMeter
 
 Steps to use these samplers as Java Request samplers in JMeter:
 
@@ -14,7 +36,7 @@ All JAR files of dependencies must also be added to this directory if you change
 3. Restart JMeter if it's running (external samplers are registered on startup).
 4. Create a new sampler within a thread group of type `Java Request` and select your class from the dropdown.
 
-## Configuration
+## JMeter sampler configuration (JMeter GUI only)
 
 When you create on of the samplers, you are greeted with a dozen or so configuration options. 
 Here's what they are and when they are applicable.
@@ -38,6 +60,10 @@ Here's what they are and when they are applicable.
 | insertCount | number | only on insert queryTypes | 
 | retryCount | number | only used by R2DBC, default 3 |
 | retryDelay | number | only used by R2DBC, default 100 ms|
+
+R2dbc's insert is equivalent to using JDBC, meaning that queries run sequential, without 
+interleaving because of the non-blocking IO, which defeats the point of using R2DBC.
+R2dbc's insert interleaved uses the flatMap operator to take advantage of the non-blocking driver.
 
 R2dbc uses `retryCount` and `retryDelay` to provide exponenential backoff when there are 
 too many open connections already. The r2dbc repository will go to a delay of maximum 

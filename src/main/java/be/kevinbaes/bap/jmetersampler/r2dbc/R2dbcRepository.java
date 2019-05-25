@@ -33,34 +33,23 @@ public class R2dbcRepository {
         .then();
   }
 
-  public Mono<Void> insertSingleConnection(int count, int retryCount, int retryDelay) {
-    return Flux.from(connectionFactory.create())
-        .retryBackoff(retryCount, Duration.ofMillis(retryDelay), Duration.ofMillis(1000), .5)
-        .flatMap(
-            conn -> queryUtil.executeStatement(c -> doMultipleInserts(conn, count))
-        ).then();
-
-  }
-
-  private Mono<Void> doMultipleInserts(Connection connection, int count) {
+  /**
+   * This is basically using R2DBC like JDBC: doing sequential requests, waiting for the previous query to complete
+   * before doing the next.
+   */
+  public Mono<Void> insertSequential(int count, int retryCount, int retryDelay) {
     Mono<Void> allInserts = Mono.empty();
-
     for (int i = 0; i < count; i++) {
-      allInserts = allInserts
-          .then(
-              Flux
-                  .from(insertOne(connection, i))
-                  .flatMap(result -> Mono.from(result.getRowsUpdated()))
-                  .then()
-          );
+      allInserts = allInserts.then(
+          Mono.from(queryUtil.executeStatement(connection -> insertOne(connection))).then()
+      );
     }
-
     return allInserts;
   }
 
-  private Publisher<? extends Result> insertOne(Connection conn, int i) {
+  private Publisher<? extends Result> insertOne(Connection conn) {
     return conn.createStatement("INSERT INTO goal (name) VALUES ($1)")
-        .bind("$1", createRandomString(i))
+        .bind("$1", createRandomString())
         .execute();
   }
 
@@ -68,10 +57,9 @@ public class R2dbcRepository {
   /**
    * @return a some string
    */
-  private String createRandomString(int i) {
+  private String createRandomString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("goal-");
-    builder.append(i);
+    builder.append("goal");
     return builder.toString();
   }
 
