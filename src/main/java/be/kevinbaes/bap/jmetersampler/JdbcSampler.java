@@ -29,14 +29,13 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
 
   private static final Logger LOG = LoggerFactory.getLogger(JdbcSampler.class);
 
+  // TODO remove these and let them come from TestConfiguration??/skdklfj
   private static final String INSERT = "insert";
   private static final String SELECT = "select";
 
-
+  private static int SELECT_COUNT_DEFAULT = Integer.MAX_VALUE;
   private static int INSERT_COUNT_DEFAULT = 1;
   private static final String DRIVER_TYPE_DEFAULT = UNPOOLED;
-
-
 
   // The name of the sampler
   private String name;
@@ -65,8 +64,10 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
       listParameters(context);
     }
 
+    // TODO move duplicates
     String driverType = context.getParameter(DRIVER_TYPE_PARAM, DRIVER_TYPE_DEFAULT);
     String queryType = context.getParameter(QUERY_TYPE_PARAM, SELECT);
+    int selectCount = context.getIntParameter(SELECT_COUNT_PARAM, SELECT_COUNT_DEFAULT);
     int insertCount = context.getIntParameter(INSERT_COUNT_PARAM, INSERT_COUNT_DEFAULT);
 
     ConnectionOptions options = setupUtil.connectionOptions(context);
@@ -74,10 +75,11 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
     LOG.info("insert count: " + insertCount);
 
     try{
-      this.jdbcTest = new JdbcTest(new JdbcTestConfiguration(driverType, queryType, insertCount), options);
+      this.jdbcTest = new JdbcTest(new JdbcTestConfiguration(driverType, queryType, selectCount, insertCount), options);
     } catch (Exception e) {
       LOG.error("something went wrong initializing JDBC test", e);
     }
+
     name = context.getParameter(TestElement.NAME);
   }
 
@@ -154,6 +156,7 @@ public class JdbcSampler  extends AbstractJavaSamplerClient implements Serializa
 
     params.addArgument(DRIVER_TYPE_PARAM, UNPOOLED);
     params.addArgument(QUERY_TYPE_PARAM, SELECT);
+    params.addArgument(SELECT_COUNT_PARAM, Integer.toString(SELECT_COUNT_DEFAULT));
     params.addArgument(INSERT_COUNT_PARAM, Integer.toString(INSERT_COUNT_DEFAULT));
 
     return params;

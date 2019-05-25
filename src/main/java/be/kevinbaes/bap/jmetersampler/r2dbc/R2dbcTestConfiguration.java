@@ -6,8 +6,8 @@ public class R2dbcTestConfiguration extends TestConfiguration {
   private final int retryCount;
   private final int retryDelay;
 
-  public R2dbcTestConfiguration(String driverType, String queryType, int insertCount, int retryCount, int retryDelay) {
-    super(driverType, queryType, insertCount);
+  public R2dbcTestConfiguration(String driverType, String queryType, int selectCount, int insertCount, int retryCount, int retryDelay) {
+    super(driverType, queryType, selectCount, insertCount);
     this.retryCount = retryCount;
     this.retryDelay = retryDelay;
   }

@@ -38,6 +38,9 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
 
   private static int RETRY_COUNT_DEFAULT = 3;
   private static int RETRY_DELAY_DEFAULT = 100;
+
+  // TODO move all of these duplicate configurations
+  private static int SELECT_COUNT_DEFAULT = Integer.MAX_VALUE;
   private static int INSERT_COUNT_DEFAULT = 1;
   private static final String DRIVER_TYPE_DEFAULT = "pooled";
 
@@ -67,15 +70,17 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
       listParameters(context);
     }
 
+    // TODO move duplicate configruation
     String driverType = context.getParameter(DRIVER_TYPE_PARAM);
     String queryType = context.getParameter(QUERY_TYPE_PARAM, SELECT);
+    int selectCount = context.getIntParameter(SELECT_COUNT_PARAM, SELECT_COUNT_DEFAULT);
     int insertCount = context.getIntParameter(INSERT_COUNT_PARAM, INSERT_COUNT_DEFAULT);
     int retryCount = context.getIntParameter(RETRY_COUNT_PARAM, RETRY_COUNT_DEFAULT);
     int retryDelay = context.getIntParameter(RETRY_DELAY_PARAM, RETRY_DELAY_DEFAULT);
 
     try {
       ConnectionOptions options = setupUtil.connectionOptions(context);
-      r2dbcTest = new R2dbcTest(new R2dbcTestConfiguration(driverType, queryType, insertCount, retryCount, retryDelay), options);
+      r2dbcTest = new R2dbcTest(new R2dbcTestConfiguration(driverType, queryType, selectCount, insertCount, retryCount, retryDelay), options);
     } catch (Exception e) {
       LOG.error("something went wrong initializing r2dbctest", e);
     }
@@ -155,6 +160,7 @@ public class R2dbcSampler extends AbstractJavaSamplerClient implements Serializa
 
     params.addArgument(DRIVER_TYPE_PARAM, DRIVER_TYPE_DEFAULT);
     params.addArgument(QUERY_TYPE_PARAM, SELECT);
+    params.addArgument(SELECT_COUNT_PARAM, Integer.toString(SELECT_COUNT_DEFAULT));
     params.addArgument(INSERT_COUNT_PARAM, Integer.toString(INSERT_COUNT_DEFAULT));
     params.addArgument(RETRY_COUNT_PARAM, Integer.toString(RETRY_COUNT_DEFAULT));
     params.addArgument(RETRY_DELAY_PARAM, Integer.toString(RETRY_DELAY_DEFAULT));

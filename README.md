@@ -1,16 +1,21 @@
 # R2dbc and jdbc JMeter samplers
 
 This class library contains two classes which extend from JavaSamplerClient: JdbcSampler and R2dbcSampler.
-Maven is required to build the class library. 
+Maven is required to build the class library.
 
-## Running the .jmx file
+## Running the .jmx files
 
-Test plan contents:
+Insert test plan contents:
 * r2dbc insert test with interleaved queries
 * r2dbc insert test with sequential queries
 * jdbc insert test with sequential queries
 
-Open the file in the JMeter ui to see the exact config of every sampler.
+Select test plan contents:
+* r2dbc selects for 1, 1000 and 3000 values
+* jdbc selects for 1, 1000, 3000 and maximum values
+
+R2dbc select of all values will spike your CPU to 100% for ages, you have been warned.
+Open the file in the JMeter ui to change the exact config of every sampler.
 
 Assuming that JMeter bin directory is on the path, use this command to run the tests in non-gui mode.
 This command will run the testplan against a local database and append the results to results.csv.
@@ -61,6 +66,7 @@ Here's what they are and when they are applicable.
 |---|---|---|
 | driverType | pooled, unpooled | R2dbc uses r2dbc-pool, JDBC uses HikariCP |
 | queryType | select, insert, insert, interleaved | insert interleaved is only recognized by r2dbc |
+| selectCount | number | defaults to Integer.MAX_VALUE, limits select results | 
 | insertCount | number | only on insert queryTypes | 
 | retryCount | number | only used by R2DBC, default 3 |
 | retryDelay | number | only used by R2DBC, default 100 ms|

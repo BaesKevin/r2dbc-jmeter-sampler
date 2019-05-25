@@ -46,8 +46,10 @@ public class R2dbcTest {
       LOG.info("inserting [{}] times interleaved", config.getInsertCount());
 
       repository.insertInterleaved(result);
+    } else if(config.getQueryType().equals(SELECT)){
+      return repository.select(result);
     } else {
-      repository.select(result);
+      LOG.error("Trying to use unsupported query type: [{}]", config.getQueryType());
     }
 
     return new ArrayList<>();

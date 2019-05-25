@@ -28,7 +28,8 @@ public class JdbcRepository implements Repository<DeviceEvent> {
       conn = dataSource.getConnection();
       sampleResult.connectEnd();
 
-      try (Statement stmt = conn.createStatement(); ResultSet resultSet = stmt.executeQuery("select * from device_event")) {
+      String query = "select * from device_event limit " + jdbcTestConfiguration.getSelectCount();
+      try (Statement stmt = conn.createStatement(); ResultSet resultSet = stmt.executeQuery(query)) {
 
         while (resultSet.next()) {
           int id = resultSet.getInt("id");

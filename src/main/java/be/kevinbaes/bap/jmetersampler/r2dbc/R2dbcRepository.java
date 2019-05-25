@@ -92,8 +92,8 @@ public class R2dbcRepository implements Repository<DeviceEvent> {
     return Mono.from(connectionFactory.create())
         .flatMapMany(conn -> {
               sampleResult.connectEnd();
-
-              return Flux.from(conn.createStatement("select * from device_event;")
+              String query = "select * from device_event limit " + r2dbcTestConfiguration.getSelectCount();
+              return Flux.from(conn.createStatement(query)
                   .execute())
                   .flatMap(result -> result.map(this::mapRow))
                   .concatWith(Mono.from(conn.close()).then(Mono.empty()))

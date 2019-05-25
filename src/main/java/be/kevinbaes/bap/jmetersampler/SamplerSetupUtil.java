@@ -11,6 +11,7 @@ class SamplerSetupUtil {
 
   static final String DRIVER_TYPE_PARAM = "Driver type";
   static final String QUERY_TYPE_PARAM = "Query type";
+  static final String SELECT_COUNT_PARAM = "Select count";
   static final String INSERT_COUNT_PARAM = "Insert count";
   static final String RETRY_COUNT_PARAM = "Retry count";
   static final String RETRY_DELAY_PARAM = "Retry delay";
