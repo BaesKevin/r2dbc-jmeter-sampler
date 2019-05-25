@@ -1,6 +1,7 @@
 package be.kevinbaes.bap.jmetersampler.r2dbc;
 
 import be.kevinbaes.bap.jmetersampler.Repository;
+import be.kevinbaes.bap.jmetersampler.TestConfiguration;
 import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.spi.ConnectionFactory;
@@ -17,7 +18,7 @@ public class R2dbcTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(R2dbcTest.class);
 
-  private final R2dbcTestConfiguration config;
+  private final TestConfiguration config;
   private ConnectionFactory connectionFactory;
   private final Repository<?> repository;
 

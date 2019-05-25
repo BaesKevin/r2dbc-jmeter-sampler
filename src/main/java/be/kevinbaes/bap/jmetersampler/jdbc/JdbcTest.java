@@ -1,6 +1,7 @@
 package be.kevinbaes.bap.jmetersampler.jdbc;
 
 import be.kevinbaes.bap.jmetersampler.Repository;
+import be.kevinbaes.bap.jmetersampler.TestConfiguration;
 import be.kevinbaes.bap.jmetersampler.domain.ConnectionOptions;
 import org.apache.jmeter.samplers.SampleResult;
 import org.slf4j.Logger;
@@ -16,7 +17,7 @@ import static be.kevinbaes.bap.jmetersampler.jdbc.JdbcTestConfiguration.POOLED;
 public class JdbcTest {
   private static final Logger LOG = LoggerFactory.getLogger(JdbcTest.class);
 
-  private JdbcTestConfiguration configuration;
+  private TestConfiguration configuration;
   private DataSource dataSource;
   private Repository<?> goalRepository;
 
